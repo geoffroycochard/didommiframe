@@ -1,0 +1,1 @@
+import { DidomIframe } from './didomiframe';
