@@ -1,14 +1,26 @@
 import { Overlay } from './lib/overlay';
-import { config  } from './lib/config';
+import defaults from './defaults';
 
 export class DidomIframe {
 
     /**
      * 
      */
-    constructor() {
-        this.cookies = config;
-        this.initializeEvents();
+    constructor(options = {}) {
+        // vendors
+        if (options.vendors !== undefined) {
+            this.vendors = {...defaults.vendors, ...options.vendors}   
+        }
+        // design
+        if (options.design !== undefined) {
+            this.design = {...defaults.design, ...options.design}   
+        }
+        // Didomi config
+        if (options.didonfig !== undefined) {
+            this.didonfig = {...defaults.didonfig, ...options.didonfig}   
+        }
+        
+        this.initializeEvents()
     }
 
     /**
@@ -26,8 +38,8 @@ export class DidomIframe {
         })
         document.addEventListener('DOMContentLoaded', function (e) {
             let pattern = [];
-            for (const key in $this.cookies) {
-                pattern.push($this.cookies[key].pattern);
+            for (const key in $this.vendors) {
+                pattern.push($this.vendors[key].pattern);
             }   
             let iframes = document.querySelectorAll(pattern.join(','));
             for (let i = 0; i < iframes.length; i++) {
@@ -45,11 +57,11 @@ export class DidomIframe {
      * @returns 
      */
     haveToConsentAndWhich(iframe) {
-        for (const key in this.cookies) {
-            let regex = new RegExp(this.cookies[key].url);
+        for (const key in this.vendors) {
+            let regex = new RegExp(this.vendors[key].url);
             let res = regex.test(iframe.src);
             if (regex.test(iframe.src)) {
-                return this.cookies[key];
+                return this.vendors[key];
             }
         }   
         return false
@@ -65,11 +77,8 @@ export class DidomIframe {
         let iframeClone = iframe.cloneNode(); 
         iframeClone.src = '';
         iframeClone.dataset.src = iframe.src;
-        let overlay = new Overlay(200,300);
-        let newNode = document.createElement('div');
-        newNode.classList.add('di-container',`di-container-${vendor.id}`);
-        newNode.append(overlay, iframeClone); 
-        iframe.after(newNode);
+        let  container = new Overlay(vendor,iframeClone,this.design);
+        iframe.after(container);
         iframe.remove();
 
         // Create the "didomiOnReady" listener
@@ -82,19 +91,19 @@ export class DidomIframe {
                 // Check if the "consentStatus" is true (eg. the user agreed to the vendor & his purposes)
                 if (consentStatus === true) {
                     // Get the youtube iframe with a 'data-src' attribute
-                    let iframe = newNode.querySelector('iframe[data-src]');
+                    let iframe = container.querySelector('iframe[data-src]');
                     // Get the 'data-src' value
                     let src = iframe.getAttribute('data-src');
                     // Set the 'data-src' value to the 'src' attribute
                     iframe.setAttribute('src', src);
                     // Hide the overlay
-                    newNode.querySelector('.di-consent-overlay').style.display = 'none';
+                    container.querySelector('.di-consent-overlay').style.display = 'none';
                 }
             })
         });
 
         // An event listener is attached to each button element
-        newNode.querySelectorAll('.di-consent-overlay-accept-button').forEach(function(button) {
+        container.querySelectorAll('.di-consent-overlay-accept-button').forEach(function(button) {
             button.addEventListener('click', function() {
                 // Get all the vendor purposes
                 var purposes = Didomi.getVendorById(vendor.name).purposeIds;

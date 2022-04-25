@@ -1,16 +1,34 @@
 export class Overlay {
-    constructor(width, height) {
-        this.html = `
-            <div class="di-consent-overlay-text" style="width:${width}; height="${height}">
-                Viewing this video may result in cookies being placed by the vendor of the video platform to which you will be directed.
-                Given the refusal of the deposit of cookies that you have expressed, in order to respect your choice, we have blocked the playback of this video.
-                If you want to continue and play the video, you must give us your consent by clicking on the button below.
-            </div>
-            <a class="di-consent-overlay-accept-button">I accept - Launch the video</div>
-        `
-        let node = document.createElement('div');
-        node.classList.add('di-consent-overlay');
-        node.innerHTML += this.html;
-        return node;
+    constructor(vendor, iframe, design) {
+
+        let container = document.createElement('div');
+        container.classList.add('di-container', `di-container-${vendor.id}`)
+        this._insertStyle(container, design.container)
+        
+        let overlay = document.createElement('div')
+        overlay.classList.add('di-consent-overlay')
+        this._insertStyle(overlay, design.overlay)
+        
+        let text = document.createElement('div')
+        text.classList.add('di-consent-text')
+        this._insertStyle(text, design.text)
+        text.innerHTML = `<p style="margin-bottom: 30px">${vendor.text}</p>`; 
+
+        let button = document.createElement('a')
+        button.classList.add('di-consent-overlay-accept-button')
+        this._insertStyle(button, design.button)
+        button.innerText = vendor.button
+
+        iframe.style.display = 'block'
+        text.append(button)
+        overlay.append(text)
+        container.append(overlay,iframe);
+        return container;
+    }
+
+    _insertStyle(dom, styles) {
+        for (const [key, value] of Object.entries(styles)) {
+            dom.style[key] = value
+        }
     }
 }
