@@ -8,14 +8,17 @@ export class DidomIframe {
      */
     constructor(options = {}) {
         // vendors
+        this.vendors = defaults.vendors
         if (options.vendors !== undefined) {
             this.vendors = {...defaults.vendors, ...options.vendors}   
         }
         // design
+        this.design = defaults.design
         if (options.design !== undefined) {
             this.design = {...defaults.design, ...options.design}   
         }
         // Didomi config
+        this.didonfig = defaults.didonfig
         if (options.didonfig !== undefined) {
             this.didonfig = {...defaults.didonfig, ...options.didonfig}   
         }

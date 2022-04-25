@@ -1,11 +1,6 @@
 import { DidomIframe } from './didomiframe';
 
 let instance = new DidomIframe({
-    "vendors": {
-        "rr": {
-            "pattern": "rrrrr"
-        }
-    },
     "design": {
         'overlay': {
             'backgroundColor': 'rgba(0,0,0,0.1)',
